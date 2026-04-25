@@ -1,0 +1,135 @@
+/* 1. Importamos todo el framework de Tailwind v4 */
+@import "tailwindcss";
+
+/* 2. Inyectamos tu configuración personalizada */
+@theme {
+  /* Colores de marca */
+  --color-brand: #3b82f6;
+  --color-brand-hover: #2563eb;
+  
+  /* Colores oscuros */
+  --color-dark-bg: #0b1120;
+  --color-dark-card: #1e293b;
+  --color-dark-border: #334155;
+
+  /* Tipografía */
+  --font-sans: "Montserrat", sans-serif;
+  --font-heading: "Cal Sans", sans-serif;
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+}
+
+/* -----------------------------------
+   Animaciones Entrada (Keyframes)
+----------------------------------- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    /* La animación se detiene en su estado final (forwards) */
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* -----------------------------------
+   Animaciones Elementos Flotantes
+----------------------------------- */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+    100% { transform: translateY(0px); }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+    animation: float 5s ease-in-out infinite;
+    animation-delay: 2s; /* Comienza después para desincronizar */
+}
+
+/* -----------------------------------
+   Animaciones de Aparición al hacer Scroll (Intersection Observer)
+----------------------------------- */
+
+/* Estado inicial (oculto) para elementos a animar */
+.block-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Estado final y la transacción (aplicada por JS a la clase padre/activa) */
+.animate-slide-up-show {
+    animation: fadeInUp 0.7s ease-out forwards;
+}
+
+/* -----------------------------------
+   Animaciones Decorativas
+----------------------------------- */
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.05); }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 6s ease-in-out infinite;
+}
+
+/* -----------------------------------
+   Estilos de Foco (Accesibilidad)
+----------------------------------- */
+*:focus-visible {
+    outline: 2px solid #3b82f6; /* Color azul de Tailwind (brand) */
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* -----------------------------------
+   Scrollbar Personalizado Elegante (Webkit)
+----------------------------------- */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0b1120; /* Fondo oscuro (dark-bg) */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155; /* Borde oscuro (dark-border) */
+    border-radius: 6px;
+    border: 3px solid #0b1120; /* Margen interior */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569; /* Gris más claro al hover */
+}
+
+/* Animación marquee */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused; /* Se pausa al pasar el mouse */
+}
