@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // ------------------------------------------------------------------
     // 1. Footer: Calcular y actualizar el año actual dinámicamente
     // ------------------------------------------------------------------
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función principal para alternar estado del menú
     function toggleMenu() {
         isMenuOpen = !isMenuOpen;
-        
+
         if (isMenuOpen) {
             // Abrir menú
             mobileMenu.classList.remove('hidden');
@@ -29,19 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 mobileMenu.classList.remove('opacity-0', '-translate-y-4');
                 mobileMenu.classList.add('opacity-100', 'translate-y-0');
             }, 10);
-            
+
             // Cambiar icono a 'X'
             menuIconPath.setAttribute('d', 'M6 18L18 6M6 6l12 12');
         } else {
             // Cerrar menú animado
             mobileMenu.classList.remove('opacity-100', 'translate-y-0');
             mobileMenu.classList.add('opacity-0', '-translate-y-4');
-            
+
             // Esperar a que acabe la transacción CSS (300ms aprox) antes de dar display: none
             setTimeout(() => {
                 mobileMenu.classList.add('hidden');
             }, 300);
-            
+
             // Volver al icono de hamburguesa normal
             menuIconPath.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
         }
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Navbar: Efecto Sticky (Desplazamiento Translúcido al Scrollear)
     // ------------------------------------------------------------------
     const navbar = document.getElementById('navbar');
-    
+
     function handleScrollNavbar() {
         if (window.scrollY > 30) {
             // Aplicar fondo, blur, sombra y borde cuando bajas un poco
@@ -89,17 +89,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const targetId = this.getAttribute('href');
-            if(targetId === '#') return; // Ignorar enlaces vacíos
-            
+            if (targetId === '#') return; // Ignorar enlaces vacíos
+
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
                 e.preventDefault();
-                
+
                 // Calculamos la posición tomando en cuenta el alto del navbar
                 const navbarHeight = navbar.offsetHeight;
                 const elementPosition = targetElement.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - (navbarHeight + 20); // 20px espacio extra visual
-                
+
                 window.scrollTo({
                     top: offsetPosition,
                     behavior: "smooth"
@@ -113,24 +113,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------------------------------------------------------------------
     const MisProyectos = [
         {
-            titulo: "Plataforma de Servicios de Belleza + Agenda",
-            descripcion: "Aplicación web interactiva para servicios de pestañas y cejas. Integra precios dinámicos conectándose directamente a una base de datos en Google Sheets.",
+            titulo: {
+                es: "Plataforma de Servicios de Belleza + Agenda",
+                en: "Beauty Services Platform + Planner"
+            },
+            descripcion: {
+                es: "Aplicación web interactiva para servicios de pestañas y cejas. Integra precios dinámicos conectándose directamente a una base de datos en Google Sheets.",
+                en: "Interactive web application for lash and brow services. Integrates dynamic pricing by connecting directly to a Google Sheets database."
+            },
             imagen: "./assets/img/lash-agenda.png",
             url: "https://lash-agenda.vercel.app/",
             github: "https://github.com/EfrenLoR/lash-agenda",
             tecnologias: ["HTML", "CSS", "JavaScript", "Google Sheets", "React", "VITE"]
         },
         {
-            titulo: "Estrategia Meta Ads - SocialON Agency",
-            descripcion: "Pequeño negocio de manejo de redes sociales, estrategia de Meta Ads y generación de leads.",
+            titulo: {
+                es: "Estrategia Meta Ads - SocialON Agency",
+                en: "Meta Ads Strategy - SocialON Agency"
+            },
+            descripcion: {
+                es: "Pequeño negocio de manejo de redes sociales, estrategia de Meta Ads y generación de leads.",
+                en: "Small business for social media management, Meta Ads strategy, and lead generation."
+            },
             imagen: "./assets/img/meta-ads.png",
             url: "https://www.facebook.com/SoocialOn",
             github: "#",
             tecnologias: ["Meta Ads", "Estrategia", "Marketing"]
         },
         {
-            titulo: "Invitaciones Digitales",
-            descripcion: "Creación de invitaciones digitales para eventos sociales, con animaciones y efectos visuales.",
+            titulo: {
+                es: "Invitaciones Digitales",
+                en: "Digital Invitations"
+            },
+            descripcion: {
+                es: "Creación de invitaciones digitales para eventos sociales, con animaciones y efectos visuales.",
+                en: "Creation of digital invitations for social events, with animations and visual effects."
+            },
             imagen: "./assets/img/invitacion-web.png",
             url: "https://xv-naomi.netlify.app/",
             github: "#",
@@ -143,27 +161,50 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------------------------------------------------------------------
     const projectsContainer = document.getElementById('contenedor-proyectos');
 
-    if (projectsContainer) {
+    // Creamos el Observer fuera para reusarlo
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15
+    };
+
+    const animateOnScroll = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-slide-up-show');
+                observer.unobserve(entry.target);
+            }
+        });
+    };
+
+    const scrollObserver = new IntersectionObserver(animateOnScroll, observerOptions);
+
+    function renderProyectos() {
+        if (!projectsContainer) return;
+
         // A. Limpiamos el contenedor
         projectsContainer.innerHTML = '';
 
         // B. Dibujamos las tarjetas
         MisProyectos.forEach((proyecto, index) => {
             const card = document.createElement('div');
-            
+
+            const tituloActual = proyecto.titulo[currentLang] || proyecto.titulo['es'];
+            const descActual = proyecto.descripcion[currentLang] || proyecto.descripcion['es'];
+
             card.className = 'bg-dark-card/40 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:shadow-brand/20 hover:border-brand/50 transition-all duration-300 transform hover:-translate-y-2 group flex flex-col slide-up-element block-fade-in relative z-10';
             card.style.animationDelay = `${index * 150}ms`;
 
             card.innerHTML = `
                 <div class="relative overflow-hidden aspect-video">
                     <div class="absolute inset-0 bg-dark-bg/60 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
-                    <img src="${proyecto.imagen}" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80'" alt="${proyecto.titulo}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                    <img src="${proyecto.imagen}" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80'" alt="${tituloActual}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
                 </div>
                 
                 <div class="p-6 flex flex-col flex-grow">
-                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-brand transition-colors">${proyecto.titulo}</h3>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-brand transition-colors">${tituloActual}</h3>
                     <p class="text-gray-400 text-sm mb-4 leading-relaxed line-clamp-3">
-                        ${proyecto.descripcion}
+                        ${descActual}
                     </p>
                     
                     <div class="flex flex-wrap gap-2 mb-6">
@@ -189,25 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             projectsContainer.appendChild(card);
         });
 
-        // C. Creamos el Observer DENTRO del mismo bloque para evitar errores de ReferenceError
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.15
-        };
-
-        const animateOnScroll = (entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-slide-up-show');
-                    observer.unobserve(entry.target);
-                }
-            });
-        };
-
-        const scrollObserver = new IntersectionObserver(animateOnScroll, observerOptions);
-
-        // D. Observamos TODOS los elementos animados (incluyendo nuestras nuevas tarjetas)
+        // C. Observamos TODOS los elementos animados (incluyendo nuestras nuevas tarjetas)
         const animatedElements = document.querySelectorAll('.slide-up-element');
         animatedElements.forEach(el => scrollObserver.observe(el));
     }
@@ -227,8 +250,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { nombre: "Illustrator", color: "text-[#FF9A00]", viewBox: "0 0 24 24", svg: '<path d="M10.53 10.73c-.1-.31-.19-.61-.29-.92-.1-.31-.19-.6-.27-.89-.08-.28-.15-.54-.22-.78h-.02c-.09.43-.2.86-.34 1.29-.15.48-.3.98-.46 1.48-.14.51-.29.98-.44 1.4h2.54c-.06-.211-.14-.46-.23-.721-.09-.269-.18-.559-.27-.859zM19.75.3H4.25C1.9.3 0 2.2 0 4.55v14.9c0 2.35 1.9 4.25 4.25 4.25h15.5c2.35 0 4.25-1.9 4.25-4.25V4.55C24 2.2 22.1.3 19.75.3zM14.7 16.83h-2.091c-.069.01-.139-.04-.159-.11l-.82-2.38H7.91l-.76 2.35c-.02.09-.1.15-.19.141H5.08c-.11 0-.14-.061-.11-.18L8.19 7.38c.03-.1.06-.21.1-.33.04-.21.06-.43.06-.65-.01-.05.03-.1.08-.11h2.59c.08 0 .12.03.13.08l3.65 10.3c.03.109 0 .16-.1.16zm3.4-.15c0 .11-.039.16-.129.16H16.01c-.1 0-.15-.061-.15-.16v-7.7c0-.1.041-.14.131-.14h1.98c.09 0 .129.05.129.14v7.7zm-.209-9.03c-.231.24-.571.37-.911.35-.33.01-.65-.12-.891-.35-.23-.25-.35-.58-.34-.92-.01-.34.12-.66.359-.89.242-.23.562-.35.892-.35.391 0 .689.12.91.35.22.24.34.56.33.89.01.34-.11.67-.349.92z"/>' },
             { nombre: "Git", color: "text-[#F05032]", viewBox: "0 0 24 24", svg: '<path d="M23.546 10.93L13.067.452c-.604-.603-1.582-.603-2.188 0L8.708 2.627l2.76 2.76c.645-.215 1.379-.07 1.889.441.516.515.658 1.258.438 1.9l2.658 2.66c.645-.223 1.387-.078 1.9.435.721.72.721 1.884 0 2.604-.719.719-1.881.719-2.6 0-.539-.541-.674-1.337-.404-1.996L12.86 8.955v6.525c.176.086.342.203.488.348.713.721.713 1.883 0 2.6-.719.721-1.889.721-2.609 0-.719-.719-.719-1.879 0-2.598.182-.18.387-.316.605-.406V8.835c-.217-.091-.424-.222-.6-.401-.545-.545-.676-1.342-.396-2.009L7.636 3.7.45 10.881c-.6.605-.6 1.584 0 2.189l10.48 10.477c.604.604 1.582.604 2.186 0l10.43-10.43c.605-.603.605-1.582 0-2.187"/>' },
             { nombre: "GitHub", color: "text-white", viewBox: "0 0 24 24", svg: '<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>' },
-            { nombre: "React", color:"text-[#004ce5ff]", viewBox: "0 0 24 24", svg: '<path d="M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.235-2.236 2.236 2.236 0 0 1 2.236 2.236zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.945-.25 1.44-.96-.236-2.006-.417-3.107-.534-.66-.905-1.345-1.727-2.035-2.447 1.592-1.48 3.087-2.292 4.105-2.295zm-9.77.02c1.012 0 2.514.808 4.11 2.28-.686.72-1.37 1.537-2.02 2.442-1.107.117-2.154.298-3.113.538-.112-.49-.195-.964-.254-1.42-.23-1.868.054-3.32.714-3.707.19-.09.4-.127.563-.132zm4.882 3.05c.455.468.91.992 1.36 1.564-.44-.02-.89-.034-1.345-.034-.46 0-.915.01-1.36.034.44-.572.895-1.096 1.345-1.565zM12 8.1c.74 0 1.477.034 2.202.093.406.582.802 1.203 1.183 1.86.372.64.71 1.29 1.018 1.946-.308.655-.646 1.31-1.013 1.95-.38.66-.773 1.288-1.18 1.87-.728.063-1.466.098-2.21.098-.74 0-1.477-.035-2.202-.093-.406-.582-.802-1.204-1.183-1.86-.372-.64-.71-1.29-1.018-1.946.303-.657.646-1.313 1.013-1.954.38-.66.773-1.286 1.18-1.868.728-.064 1.466-.098 2.21-.098zm-3.635.254c-.24.377-.48.763-.704 1.16-.225.39-.435.782-.635 1.174-.265-.656-.49-1.31-.676-1.947.64-.15 1.315-.283 2.015-.386zm7.26 0c.695.103 1.365.23 2.006.387-.18.632-.405 1.282-.66 1.933-.2-.39-.41-.783-.64-1.174-.225-.392-.465-.774-.705-1.146zm3.063.675c.484.15.944.317 1.375.498 1.732.74 2.852 1.708 2.852 2.476-.005.768-1.125 1.74-2.857 2.475-.42.18-.88.342-1.355.493-.28-.958-.646-1.956-1.1-2.98.45-1.017.81-2.01 1.085-2.964zm-13.395.004c.278.96.645 1.957 1.1 2.98-.45 1.017-.812 2.01-1.086 2.964-.484-.15-.944-.318-1.37-.5-1.732-.737-2.852-1.706-2.852-2.474 0-.768 1.12-1.742 2.852-2.476.42-.18.88-.342 1.356-.494zm11.678 4.28c.265.657.49 1.312.676 1.948-.64.157-1.316.29-2.016.39.24-.375.48-.762.705-1.158.225-.39.435-.788.636-1.18zm-9.945.02c.2.392.41.783.64 1.175.23.39.465.772.705 1.143-.695-.102-1.365-.23-2.006-.386.18-.63.406-1.282.66-1.933zM17.92 16.32c.112.493.2.968.254 1.423.23 1.868-.054 3.32-.714 3.708-.147.09-.338.128-.563.128-1.012 0-2.514-.807-4.11-2.28.686-.72 1.37-1.536 2.02-2.44 1.107-.118 2.154-.3 3.113-.54zm-11.83.01c.96.234 2.006.415 3.107.532.66.905 1.345 1.727 2.035 2.446-1.595 1.483-3.092 2.295-4.11 2.295-.22-.005-.406-.05-.553-.132-.666-.38-.955-1.834-.73-3.703.054-.46.142-.944.25-1.438zm4.56.64c.44.02.89.034 1.345.034.46 0 .915-.01 1.36-.034-.44.572-.895 1.095-1.345 1.565-.455-.47-.91-.993-1.36-1.565z"/>' },
-            { nombre: "Vite", color: "text-[#646CFF]", viewBox: "0 0 24 24", svg: '<path d="M13.056 23.238a.57.57 0 0 1-1.02-.355v-5.202c0-.63-.512-1.143-1.144-1.143H5.148a.57.57 0 0 1-.464-.903l3.777-5.29c.54-.753 0-1.804-.93-1.804H.57a.574.574 0 0 1-.543-.746.6.6 0 0 1 .08-.157L5.008.78a.57.57 0 0 1 .467-.24h14.589a.57.57 0 0 1 .466.903l-3.778 5.29c-.54.755 0 1.806.93 1.806h5.745c.238 0 .424.138.513.322a.56.56 0 0 1-.063.603z"/>'}
+            { nombre: "React", color: "text-[#004ce5ff]", viewBox: "0 0 24 24", svg: '<path d="M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.235-2.236 2.236 2.236 0 0 1 2.236 2.236zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.945-.25 1.44-.96-.236-2.006-.417-3.107-.534-.66-.905-1.345-1.727-2.035-2.447 1.592-1.48 3.087-2.292 4.105-2.295zm-9.77.02c1.012 0 2.514.808 4.11 2.28-.686.72-1.37 1.537-2.02 2.442-1.107.117-2.154.298-3.113.538-.112-.49-.195-.964-.254-1.42-.23-1.868.054-3.32.714-3.707.19-.09.4-.127.563-.132zm4.882 3.05c.455.468.91.992 1.36 1.564-.44-.02-.89-.034-1.345-.034-.46 0-.915.01-1.36.034.44-.572.895-1.096 1.345-1.565zM12 8.1c.74 0 1.477.034 2.202.093.406.582.802 1.203 1.183 1.86.372.64.71 1.29 1.018 1.946-.308.655-.646 1.31-1.013 1.95-.38.66-.773 1.288-1.18 1.87-.728.063-1.466.098-2.21.098-.74 0-1.477-.035-2.202-.093-.406-.582-.802-1.204-1.183-1.86-.372-.64-.71-1.29-1.018-1.946.303-.657.646-1.313 1.013-1.954.38-.66.773-1.286 1.18-1.868.728-.064 1.466-.098 2.21-.098zm-3.635.254c-.24.377-.48.763-.704 1.16-.225.39-.435.782-.635 1.174-.265-.656-.49-1.31-.676-1.947.64-.15 1.315-.283 2.015-.386zm7.26 0c.695.103 1.365.23 2.006.387-.18.632-.405 1.282-.66 1.933-.2-.39-.41-.783-.64-1.174-.225-.392-.465-.774-.705-1.146zm3.063.675c.484.15.944.317 1.375.498 1.732.74 2.852 1.708 2.852 2.476-.005.768-1.125 1.74-2.857 2.475-.42.18-.88.342-1.355.493-.28-.958-.646-1.956-1.1-2.98.45-1.017.81-2.01 1.085-2.964zm-13.395.004c.278.96.645 1.957 1.1 2.98-.45 1.017-.812 2.01-1.086 2.964-.484-.15-.944-.318-1.37-.5-1.732-.737-2.852-1.706-2.852-2.474 0-.768 1.12-1.742 2.852-2.476.42-.18.88-.342 1.356-.494zm11.678 4.28c.265.657.49 1.312.676 1.948-.64.157-1.316.29-2.016.39.24-.375.48-.762.705-1.158.225-.39.435-.788.636-1.18zm-9.945.02c.2.392.41.783.64 1.175.23.39.465.772.705 1.143-.695-.102-1.365-.23-2.006-.386.18-.63.406-1.282.66-1.933zM17.92 16.32c.112.493.2.968.254 1.423.23 1.868-.054 3.32-.714 3.708-.147.09-.338.128-.563.128-1.012 0-2.514-.807-4.11-2.28.686-.72 1.37-1.536 2.02-2.44 1.107-.118 2.154-.3 3.113-.54zm-11.83.01c.96.234 2.006.415 3.107.532.66.905 1.345 1.727 2.035 2.446-1.595 1.483-3.092 2.295-4.11 2.295-.22-.005-.406-.05-.553-.132-.666-.38-.955-1.834-.73-3.703.054-.46.142-.944.25-1.438zm4.56.64c.44.02.89.034 1.345.034.46 0 .915-.01 1.36-.034-.44.572-.895 1.095-1.345 1.565-.455-.47-.91-.993-1.36-1.565z"/>' },
+            { nombre: "Vite", color: "text-[#646CFF]", viewBox: "0 0 24 24", svg: '<path d="M13.056 23.238a.57.57 0 0 1-1.02-.355v-5.202c0-.63-.512-1.143-1.144-1.143H5.148a.57.57 0 0 1-.464-.903l3.777-5.29c.54-.753 0-1.804-.93-1.804H.57a.574.574 0 0 1-.543-.746.6.6 0 0 1 .08-.157L5.008.78a.57.57 0 0 1 .467-.24h14.589a.57.57 0 0 1 .466.903l-3.778 5.29c-.54.755 0 1.806.93 1.806h5.745c.238 0 .424.138.513.322a.56.56 0 0 1-.063.603z"/>' }
         ];
 
         MisHabilidades.forEach(skill => {
@@ -249,50 +272,104 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------------------------------------------------------------------
     const MisEstudios = [
         {
-            titulo: "Técnico en Programación",
-            escuela: "Centro de Estudios Cientificos y Técnologico de Aguascalientes",
-            periodo: "2021 - 2024",
+            titulo: {
+                es: "Ingeniería en Sistemas Computacionales",
+                en: "Computer Systems Engineering"
+            },
+            escuela: {
+                es: "Tecnológico Universitario de Aguascalientes",
+                en: "University Technological of Aguascalientes"
+            },
+            periodo: {
+                es: "Septiembre 2023 - Agosto 2026",
+                en: "September 2023 - August 2026"
+            }
         },
         {
-            titulo: "Licenciatura en Mercadotecnia",
-            escuela: "Universidad Autónoma de Aguascalientes",
-            periodo: "Enero 2018 - Junio 2021",
+            titulo: {
+                es: "Licenciatura en Mercadotecnia",
+                en: "Bachelor of Marketing"
+            },
+            escuela: {
+                es: "Universidad Autónoma de Aguascalientes",
+                en: "Autonomous University of Aguascalientes"
+            },
+            periodo: {
+                es: "Enero 2018 - Junio 2021",
+                en: "January 2018 - June 2021"
+            }
         },
         {
-            titulo: "Ingeniería en Sistemas Computacionales",
-            escuela: "Tecnológico Universitario de Aguascalientes",
-            periodo: "Septiembre 2023 - Agosto 2026",
+            titulo: {
+                es: "Técnico en Programación",
+                en: "Programming Technician"
+            },
+            escuela: {
+                es: "Centro de Estudios Cientificos y Técnologico de Aguascalientes",
+                en: "Center for Scientific and Technological Studies of Aguascalientes"
+            },
+            periodo: {
+                es: "2014 - 2017",
+                en: "2014 - 2017"
+            }
         }
     ];
 
     const estudiosContainer = document.getElementById('estudios-grid');
 
-    MisEstudios.forEach(estudio => {
-        const div = document.createElement('div');
-        div.className = 'bg-dark-card/40 backdrop-blur-md border border-white/10 rounded-xl p-6 group hover:border-brand hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300 hover:-translate-y-2';
-        div.innerHTML = `
-            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-brand transition-colors">${estudio.titulo}</h3>
-            <p class="text-gray-400 text-sm mb-4">${estudio.escuela}</p>
-            <p class="text-gray-500 text-xs font-mono">${estudio.periodo}</p>
-        `;
-        estudiosContainer.appendChild(div);
-    });
+    function renderEstudios() {
+        if (!estudiosContainer) return;
+        estudiosContainer.innerHTML = '';
+
+        MisEstudios.forEach(estudio => {
+            const tituloActual = estudio.titulo[currentLang] || estudio.titulo['es'];
+            const escuelaActual = estudio.escuela[currentLang] || estudio.escuela['es'];
+            const periodoActual = estudio.periodo[currentLang] || estudio.periodo['es'];
+
+            const div = document.createElement('div');
+            div.className = 'bg-dark-card/40 backdrop-blur-md border border-white/10 rounded-xl p-6 group hover:border-brand hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] transition-all duration-300 hover:-translate-y-2';
+            div.innerHTML = `
+                <h3 class="text-xl font-bold text-white mb-2 group-hover:text-brand transition-colors">${tituloActual}</h3>
+                <p class="text-gray-400 text-sm mb-4">${escuelaActual}</p>
+                <p class="text-gray-500 text-xs font-mono">${periodoActual}</p>
+            `;
+            estudiosContainer.appendChild(div);
+        });
+    }
 
     // ------------------------------------------------------------------
     // 9. Base de Datos de Experiencia
     // ------------------------------------------------------------------
     const MisExperiencias = [
         {
-            titulo: "Practicante de Desarrollo de Software",
-            empresa: "GL Pestañas",
+            titulo: {
+                es: "Practicante de Desarrollo de Software",
+                en: "Software Development Intern"
+            },
+            empresa: {
+                es: "GL Pestañas",
+                en: "GL Lashes"
+            },
             periodo: "2026",
-            descripcion: "Creación de sitio web, desarrollo de landing pages, implementación de nuevas tecnologías, uso de API Google Sheets para automatización de procesos."
+            descripcion: {
+                es: "Creación de sitio web, desarrollo de landing pages, implementación de nuevas tecnologías, uso de API Google Sheets para automatización de procesos.",
+                en: "Website creation, landing page development, implementation of new technologies, use of Google Sheets API for process automation."
+            }
         },
         {
-            titulo: "Staff Community Manager",
-            empresa: "MexQ - Aseguradora de Calidad",
+            titulo: {
+                es: "Staff Community Manager",
+                en: "Staff Community Manager"
+            },
+            empresa: {
+                es: "MexQ - Aseguradora de Calidad",
+                en: "MexQ - Quality Assurance"
+            },
             periodo: "2024 - 2026",
-            descripcion: "Digitalización de procesos, automatización de tareas, análisis de datos, responsable de gestionar la presencia de la empresa en redes sociales, generar contenido, interactuar con la comunidad y analizar métricas de rendimiento."
+            descripcion: {
+                es: "Digitalización de procesos, automatización de tareas, análisis de datos, responsable de gestionar la presencia de la empresa en redes sociales, generar contenido, interactuar con la comunidad y analizar métricas de rendimiento.",
+                en: "Process digitization, task automation, data analysis, responsible for managing the company's presence on social media, generating content, interacting with the community, and analyzing performance metrics."
+            }
         }
     ];
 
@@ -305,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Animar la tarjeta
                 entry.target.classList.remove('opacity-0', 'translate-y-6');
                 entry.target.classList.add('opacity-100', 'translate-y-0');
-                
+
                 // Iluminar el punto correspondiente
                 const dot = entry.target.querySelector('.timeline-dot');
                 if (dot) {
@@ -326,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener("scroll", () => {
             const rect = experienciaTimeline.getBoundingClientRect();
             const windowHeight = window.innerHeight;
-            
+
             // Queremos que la línea progrese según una posición visual, ej: el 65% de la altura de la pantalla
             const visualOffset = windowHeight * 0.65;
 
@@ -337,14 +414,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             timelineLine.style.transform = `scaleY(${progress})`;
         });
+    }
+
+    function renderExperiencia() {
+        if (!experienciaTimeline) return;
+
+        // Limpiamos tarjetas existentes pero mantenemos la linea de timeline (fondo y progreso)
+        const existingCards = experienciaTimeline.querySelectorAll('.relative.mb-12');
+        existingCards.forEach(card => card.remove());
 
         MisExperiencias.forEach((exp, index) => {
             const isLeft = index % 2 === 0;
             const div = document.createElement('div');
 
+            const tituloActual = exp.titulo[currentLang] || exp.titulo['es'];
+            const empresaActual = exp.empresa[currentLang] || exp.empresa['es'];
+            const descActual = exp.descripcion[currentLang] || exp.descripcion['es'];
+
             // Clases iniciales para la animación de la tarjeta
             div.classList.add('opacity-0', 'translate-y-6', 'transition-all', 'duration-700', 'ease-out');
-            
+
             div.className += ` relative mb-12 flex flex-col md:flex-row items-center ${isLeft ? 'md:justify-start' : 'md:justify-end'}`;
 
             div.innerHTML = `
@@ -363,15 +452,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         </span>
 
                         <h3 class="text-xl font-bold text-white mb-1">
-                            ${exp.titulo}
+                            ${tituloActual}
                         </h3>
 
                         <p class="text-gray-400 text-sm mb-3">
-                            ${exp.empresa}
+                            ${empresaActual}
                         </p>
 
                         <p class="text-gray-500 text-sm">
-                            ${exp.descripcion}
+                            ${descActual}
                         </p>
 
                     </div>
@@ -382,4 +471,57 @@ document.addEventListener('DOMContentLoaded', () => {
             expObserver.observe(div);
         });
     }
+
+    // ------------------------------------------------------------------
+    // 10. Internacialización (i18n)
+    // ------------------------------------------------------------------
+
+    let currentLang = 'es'; // Idioma por defecto
+
+    // Función auxiliar para acceder a propiedades anidadas de un objeto como "hero.title"
+    function getNestedTranslation(obj, path) {
+        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    }
+
+    // Función para aplicar la traducción a la página
+    function setLanguage(lang) {
+        currentLang = lang;
+
+        // 1. Traducir elementos estáticos del HTML usando data-lang
+        document.querySelectorAll('[data-lang]').forEach(element => {
+            const key = element.getAttribute('data-lang');
+            const translatedText = getNestedTranslation(translations[lang], key);
+
+            if (translatedText) {
+                // Usamos innerHTML porque hay etiquetas <span> en tus traducciones
+                element.innerHTML = translatedText;
+            }
+        });
+
+        // 2. Actualizar el texto de todos los botones de idioma (escritorio y móvil)
+        document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+            btn.textContent = lang === 'es' ? 'EN' : 'ES';
+        });
+
+        // Opcional: Guardar la preferencia en localStorage para que se guarde si recarga la página
+        localStorage.setItem('portfolioLang', lang);
+
+        // 3. Volver a renderizar las secciones dinámicas (Proyectos, Estudios, etc.)
+        renderProyectos();
+        renderEstudios();
+        renderExperiencia();
+    }
+
+    // Evento click del botón
+    document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const newLang = currentLang === 'es' ? 'en' : 'es';
+            setLanguage(newLang);
+        });
+    });
+
+    // Al cargar la página, revisar si ya había un idioma guardado en el navegador
+    const savedLang = localStorage.getItem('portfolioLang') || 'es';
+    setLanguage(savedLang);
+
 }); // Cierre final del DOMContentLoaded
